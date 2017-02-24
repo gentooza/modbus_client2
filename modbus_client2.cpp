@@ -28,6 +28,7 @@
 #include <ctype.h>
 #include <vector>
 #include <time.h>
+#include <signal.h>
 #include "rlmodbus.h"
 #include "rlthread.h"
 #include "rlinifile.h"
@@ -77,7 +78,6 @@ rlThread                  *thread                   = NULL;
 rlMailbox                 *mbx                      = NULL;
 rlModbus                  *modbus                   = NULL;
 rlSocket                  *mySocket                 = NULL;
-std::vector <rlSocket*>   mySockets;
 rlSerial                  *tty                      = NULL;
 
 //logging
@@ -88,6 +88,18 @@ FILE *fout;
 static int                use_logging               = 0;
 
 static int modbus_idletime = (4*1000)/96;
+
+static int mbexit = 0;
+
+/*! function for garbage collecting when program exits SIGTERM, and SIGINT*/
+static void exitHandler(int s)
+{
+  printf("\n** Bye, thanks for using modbus_client! **\n");
+  mbexit = 1;
+
+  return;
+}
+
 
 /*! function for init modbus communications*/
 static int initModbus()
@@ -596,6 +608,15 @@ int main(int argc,char *argv[])
 {
   rlSpreadsheetCell *cell;
   int i, lifeCounter;
+  struct sigaction sigIntHandler;
+  
+  //exit handling
+  sigIntHandler.sa_handler = exitHandler;
+  sigemptyset(&sigIntHandler.sa_mask);
+  sigIntHandler.sa_flags = 0;
+  sigaction(SIGINT, &sigIntHandler, NULL);
+  sigaction(SIGTERM, &sigIntHandler, NULL);  
+  //
 
   if(init(argc, argv) != 0)
   {
@@ -603,23 +624,31 @@ int main(int argc,char *argv[])
   }
   thread->create(mailboxReadThread,NULL);
   lifeCounter = 0;
-  while(1)                 // forever run the daemon
+  while(!mbexit)                 // run daemon just exit signal, for garbage collecting
   {
     cell = namelist->getFirstCell();
     for(i=0; i<num_cycles; i++)
     {
       if(cell == NULL) break;
       strcpy(var,cell->text());
-      // thread->lock();   // done in modbusCycle
       readModbus(i);
-
-      // thread->unlock(); // done in modbusCycle
       cell = cell->getNextCell();
     }
     provider->setLifeCounter(lifeCounter++);
     if(lifeCounter >= 256*256) lifeCounter = 0;
     rlsleep(cycletime);
   }
+  
+  thread->cancel();
+  delete thread;
+  delete mbx;
+  delete provider;
+  delete modbus;
+  if (use_socket)
+      delete mySocket;
+  else
+      delete tty;  
+  delete namelist;
   return 0;
 }
 
