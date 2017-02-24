@@ -12,6 +12,7 @@ I hope it will be merged by the so beutiful project pvbrowser, if not, I hope it
 + C++ styled program, I like to program C more than C++, but as it's in the middle I prefer to code it more C++ style than C for speeding up developing.
 + More functions, I don't like loooong functions, I prefere to cut them.
 + logging possibility, as we have the debug option, it could be nice to have a logging to file option. It's also important to see the real time we spend in every slave, etc.
++ garbage collecting, it seems program doesn't free anything by default when we stop it, or kill it, now we capture SIGTERM and SIGINT to clean and close.
 
 ##compile
 as pvbrowser you need rllib installed, the full pvbrowser package is recommended
