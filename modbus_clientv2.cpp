@@ -1,5 +1,11 @@
 /***************************************************************************
- *   client for Modbus with pvbrowser                                      *
+ *   client for Modbus with pvbrowser (version 2)                          *
+ *                                                                         *
+ *   copyright (original code): (C) 2000 by R. Lehrig                      *
+ *   email                    : lehrig@t-online.de                         *
+ *                                                                         *
+ *   copyright (modified code): (C) 2017 by J. Cuéllar                     *
+ *   email                    : joa.cuellar@riseup.net                     *
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
  *   it under the terms of the GNU General Public License as published by  *
