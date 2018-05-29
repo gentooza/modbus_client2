@@ -1,3 +1,6 @@
+#IMPORTANT
+*this sollution is not really suitable, as it takes too long to switch the socket. Also it already has lot to do for banning offline devices... I recommend yo compile your own modbus client by using rlmodbusclient class*
+
 modbus client2
 ========
 
